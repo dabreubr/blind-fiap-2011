@@ -11,6 +11,4 @@
     />
 <TextView android:text="TextView" android:layout_width="wrap_content" android:id="@+id/latitude" android:layout_height="wrap_content"></TextView>
 <TextView android:text="TextView" android:id="@+id/longitude" android:layout_width="wrap_content" android:layout_height="wrap_content"></TextView>
-<Button android:text="Fechar" android:id="@+id/btnFechar" android:layout_width="wrap_content" android:layout_height="wrap_content"></Button>
-<ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/list" android:layout_x="0dip" android:layout_y="77dip"></ListView>
 </LinearLayout>
