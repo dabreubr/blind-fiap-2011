@@ -33,7 +33,6 @@ public class ReconhecimentoVoz extends Activity {
 		super.onStart();
 		
 		if (pacoteInstalado(getPackageManager())) {
-        	//voz.iniciarReconhecimentoVoz(mList);
         	Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Diga o endereço");
@@ -60,7 +59,6 @@ public class ReconhecimentoVoz extends Activity {
             startActivity(itEndereco);
         }
  
-        super.onActivityResult(requestCode, resultCode, data);
     }
 	
 	private void alertaSemReconhecimentoVoz(){  
