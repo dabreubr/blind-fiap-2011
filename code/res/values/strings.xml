@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Blind!</string>
+    <string name="hello">Olá, bem vindo ao Blind</string>
     <string name="app_name">Blind</string>
+    <string name="gps_desativado">O GPS está desabilitado</string>
+    <string name="config_gps">Mostrar configurações de local?</string>
+    <string name="OK">OK</string>
 </resources>

@@ -63,9 +63,15 @@ public class Endereco extends Activity {
 		 if (requestCode == DESAMBIGUA_VOZ) {
 			 if (resultCode == 1) {
 				 String endereco = data.getStringExtra("texto");
-				 TextView txtEndereco = new TextView(this);
-				 txtEndereco.setText(endereco);
-				 setContentView(txtEndereco);
+				 if (endereco != null)
+					 if (!endereco.equals("")) {
+						 TextView txtEndereco = new TextView(this);
+						 txtEndereco.setText(endereco);
+						 setContentView(txtEndereco);
+					 } else 
+						 finish();
+				 else
+					 finish();
 			 }
 		 }
 	}
