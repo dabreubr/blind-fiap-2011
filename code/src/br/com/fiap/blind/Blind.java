@@ -11,6 +11,8 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -65,8 +67,13 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
     	    		//unlock it here so that it is never locked again 
     	    		waitForInitLock.unlock(); 
     	    	}
-   	    		mTts.speak(this.getString(R.string.gps_desativado), TextToSpeech.QUEUE_FLUSH, null);
-    			alertaGPSDesativado();
+    			if (!internetDisponivel()) {
+	   	    		mTts.speak(this.getString(R.string.conexao_dados_desativada), TextToSpeech.QUEUE_FLUSH, null);
+	   	    		alertaDadosDesativado();
+    			} else if (!getLocationManager().isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+	   	    		mTts.speak(this.getString(R.string.gps_desativado), TextToSpeech.QUEUE_ADD, null);
+	    			alertaGPSDesativado();
+    			}
     		}
     		else {
     			getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
@@ -95,6 +102,41 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
     			Intent gpsOptionsIntent = new Intent(  
     					android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);  
     			startActivity(gpsOptionsIntent);
+    			finish();
+    		}  
+    	});  
+    	AlertDialog alert = builder.create();  
+    	alert.show();  
+    }
+    
+    private boolean internetDisponivel() {
+
+        try {
+
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getActiveNetworkInfo();
+            if (netInfo != null && netInfo.isConnectedOrConnecting()) {
+                Log.d("Blind", "Internet Disponivel:true");
+                return true;
+            } else {
+                Log.d("Blind", "Internet Disponivel:false");
+                return false;
+            }
+
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
+    
+    private void alertaDadosDesativado(){  
+    	AlertDialog.Builder builder = new AlertDialog.Builder(this);  
+    	builder.setTitle(this.getString(R.string.conexao_dados))
+    	.setMessage(this.getString(R.string.conexao_dados_desativada))
+    	.setCancelable(false)
+    	.setNegativeButton(this.getString(R.string.sair),  
+    			new DialogInterface.OnClickListener(){  
+    		public void onClick(DialogInterface dialog, int id){  
     			finish();
     		}  
     	});  

@@ -7,8 +7,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -120,7 +122,14 @@ public class DesambiguaVoz extends Activity implements TextToSpeech.OnInitListen
 	    	Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
             intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
             intent.putExtra(RecognizerIntent.EXTRA_PROMPT, resultado);
+            Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    		v.vibrate(1000);
             startActivityForResult(intent, DESAMBIGUAVOZ);
+    		try {
+    			Thread.sleep(2000);
+    		} catch (InterruptedException e) {
+    			e.printStackTrace();
+    		}
 	    }
 		
 	}
@@ -137,7 +146,8 @@ public class DesambiguaVoz extends Activity implements TextToSpeech.OnInitListen
 			
 			while (it.hasNext()) {
 				String resposta = (String) it.next();
-				if (resposta.equalsIgnoreCase("sim")) {
+				if (resposta.equalsIgnoreCase("sim") ||
+						resposta.equalsIgnoreCase("tim")) {
 					pararPerguntar = true;
 					break;
 				}
