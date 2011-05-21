@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.ReentrantLock;
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -29,17 +31,22 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
 		mList = (ListView) findViewById(R.id.list);
-		
-        ttsInitialized = false;
-		mTts = new TextToSpeech(this, this);
-        waitForInitLock.lock();
-        
 	}
 	
 	@Override
 	protected void onStart()
 	{
 		super.onStart();
+		
+        ttsInitialized = false;
+		mTts = new TextToSpeech(this, this);
+        waitForInitLock.lock();
+	}
+	
+	@Override
+	protected void onDestroy()
+	{
+		mTts.shutdown();
 	}
 	
     @Override
@@ -127,6 +134,8 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
     		Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
     		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Diga o endereço de destino");
+    		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    		v.vibrate(1000);
     		startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
     	}
 	}

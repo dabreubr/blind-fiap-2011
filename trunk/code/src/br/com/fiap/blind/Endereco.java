@@ -28,6 +28,7 @@ public class Endereco extends Activity {
         setContentView(R.layout.list);
         
         mList = (ListView) findViewById(R.id.list);
+        
         enderecos = new ArrayList<String>();
         Intent it = getIntent();
         if (it != null) {
@@ -39,7 +40,14 @@ public class Endereco extends Activity {
         
         Geocoder geocoder = new Geocoder(this);
         try {
-        	address = geocoder.getFromLocationName(paramEndereco, 3);
+        	Double latitudeSP = -23.3251;
+        	Double longitudeSP = -46.3810;
+        	Double lowerLeftLatitude = latitudeSP + 1;
+        	Double upperRightLatitude = latitudeSP - 1;
+        	Double lowerLeftLongitude = longitudeSP + 1; 
+        	Double upperRightLongitude = longitudeSP - 1;
+        	address = geocoder.getFromLocationName(paramEndereco, 3, lowerLeftLatitude,
+        			lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
         	for (int i=0; i < address.size(); i++) {
         		String rua = address.get(i).getThoroughfare();
         		String bairro = address.get(i).getLocality();
