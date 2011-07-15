@@ -10,25 +10,18 @@ import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
-import android.widget.TextView;
 
 public class Endereco extends Activity {
 
-    private ListView mList = null;
-	private List<Address> address;
+	private List<Address> address, addressOrigem;
 	private ArrayList<String> enderecos;
-	private String paramEndereco;
+	private String paramEndereco, origem;
 	private static final int DESAMBIGUA_VOZ = 1;
 	
 	@Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list);
-        
-        mList = (ListView) findViewById(R.id.list);
-        
+       
         enderecos = new ArrayList<String>();
         Intent it = getIntent();
         if (it != null) {
@@ -39,6 +32,18 @@ public class Endereco extends Activity {
         }
         
         Geocoder geocoder = new Geocoder(this);
+        try {
+        	addressOrigem = geocoder.getFromLocation(Gps.getLatitude(), Gps.getLongitude(), 1);
+    		String ruaOrigem = addressOrigem.get(0).getThoroughfare();
+    		String bairroOrigem = addressOrigem.get(0).getLocality();
+    		String ufOrigem = addressOrigem.get(0).getAdminArea();
+    		origem = ruaOrigem + " - " + bairroOrigem + " - " + ufOrigem;
+    		
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			Log.e("GeocoderLog", "Deu erro o geo coder origem - " + e1.getMessage());
+		}
+		
         try {
         	Double latitudeSP = -23.3251;
         	Double longitudeSP = -46.3810;
@@ -55,9 +60,6 @@ public class Endereco extends Activity {
         		enderecos.add(rua + " - " + bairro + " - " + uf);
         	}
    	
-            mList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-            		enderecos));
-            
         	Intent itDesambiguaVoz = new Intent(this, DesambiguaVoz.class);
             itDesambiguaVoz.putExtra("lista", enderecos);
             startActivityForResult(itDesambiguaVoz, DESAMBIGUA_VOZ);
@@ -73,9 +75,11 @@ public class Endereco extends Activity {
 				 String endereco = data.getStringExtra("texto");
 				 if (endereco != null)
 					 if (!endereco.equals("")) {
-						 TextView txtEndereco = new TextView(this);
-						 txtEndereco.setText(endereco);
-						 setContentView(txtEndereco);
+						 Intent itRota = new Intent(this, Rota.class);
+						 itRota.putExtra("destino", endereco);
+						 itRota.putExtra("origem", origem);
+				         startActivity(itRota);
+				         finish();
 					 } else 
 						 finish();
 				 else

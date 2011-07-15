@@ -42,7 +42,7 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
             );
         //don't do speak until initing 
         waitForInitLock.lock(); 
-        
+
     }
     
     @Override
@@ -153,7 +153,8 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
 	public void onLocationChanged(Location location) {
 		txtlatitude.setText(((Double) location.getLatitude()).toString());
 		txtlongitude.setText(((Double) location.getLongitude()).toString());
-		
+		Gps.setLatitude((Double) location.getLatitude());
+		Gps.setLongitude((Double) location.getLongitude());
 	}
 
 	@Override

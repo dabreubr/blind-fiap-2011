@@ -23,6 +23,7 @@
         <activity android:name=".Endereco"></activity>
         <activity android:name=".ReconhecimentoVoz"></activity>
         <activity android:name=".DesambiguaVoz"></activity>
+        <activity android:name=".Rota"></activity>
                  
     </application>
 </manifest>
