@@ -12,15 +12,12 @@ import android.os.Vibrator;
 import android.speech.RecognizerIntent;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
 
 public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener {
 
 	private ArrayList<String> lista;
 	private static int VOICE_RECOGNITION_REQUEST_CODE = 1;
 	private static int DESAMBIGUA_VOZ = 2;
-	private ListView mList;
 	private TextToSpeech mTts;
 	private boolean ttsInitialized;
 	private ReentrantLock waitForInitLock = new ReentrantLock();
@@ -30,7 +27,6 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
 		
 		super.onCreate(savedInstanceState);
         setContentView(R.layout.list);
-		mList = (ListView) findViewById(R.id.list);
 	}
 	
 	@Override
@@ -56,7 +52,6 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
         	
             // Fill the list view with the strings the recognizer thought it could have heard
         	lista = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            mList.setAdapter(new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,lista));
             
             Intent itDesambigua = new Intent(this, DesambiguaVoz.class);
             itDesambigua.putExtra("lista", lista);
