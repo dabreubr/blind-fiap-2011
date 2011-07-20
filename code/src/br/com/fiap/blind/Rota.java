@@ -84,7 +84,9 @@ public class Rota extends Activity implements Runnable {
 			i++;
 		}
 		
-		rota = "\n quantidadeConducao: " + quantidadeConducao;
+		rota = "\n origem: " + origem;
+		rota += "\n destino: " + destino;
+		rota += "\n quantidadeConducao: " + quantidadeConducao;
 		rota += "\n tempoViagem: " + tempoViagem;
 		rota += "\n valorTotalTarifa: " + valorTotalTarifa;
 		rota += "\n enderecoFinal: " + enderecoFinal;

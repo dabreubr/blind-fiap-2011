@@ -2,10 +2,10 @@
 <resources>
     <string name="hello">Olá, bem vindo ao Blind</string>
     <string name="app_name">Blind</string>
-    <string name="gps_desativado">O GPS está desabilitado</string>
+    <string name="gps_desativado">O GPS está desabilitado. Por favor habilitar.</string>
     <string name="config_gps">Mostrar configurações de local?</string>
     <string name="conexao_dados">Conexão de dados</string>
-    <string name="conexao_dados_desativada">A conexão de dados está desabilitada</string>
+    <string name="conexao_dados_desativada">A conexão de dados está desabilitada. Por favor habilitar.</string>
     <string name="OK">OK</string>
     <string name="sair">Sair</string>
 </resources>
