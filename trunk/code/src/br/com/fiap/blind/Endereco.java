@@ -45,16 +45,14 @@ public class Endereco extends Activity {
 		}
 		
         try {
-        	Double latitudeSP = -23.3251;
-        	Double longitudeSP = -46.3810;
-        	Double lowerLeftLatitude = latitudeSP + 1;
-        	Double upperRightLatitude = latitudeSP - 1;
-        	Double lowerLeftLongitude = longitudeSP + 1; 
-        	Double upperRightLongitude = longitudeSP - 1;
-        	address = geocoder.getFromLocationName(paramEndereco, 3, lowerLeftLatitude,
+        	Double lowerLeftLatitude = Gps.getLatitude() + 1;
+        	Double upperRightLatitude = Gps.getLatitude() - 1;
+        	Double lowerLeftLongitude = Gps.getLongitude() + 1; 
+        	Double upperRightLongitude = Gps.getLongitude() - 1;
+        	address = geocoder.getFromLocationName(paramEndereco + " - SP", 3, lowerLeftLatitude,
         			lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
         	for (int i=0; i < address.size(); i++) {
-        		String rua = address.get(i).getThoroughfare();
+        		String rua = tratarTexto(address.get(i).getThoroughfare());
         		String bairro = address.get(i).getLocality();
         		String uf = address.get(i).getAdminArea();
         		enderecos.add(rua + " - " + bairro + " - " + uf);
@@ -88,4 +86,11 @@ public class Endereco extends Activity {
 		 }
 	}
 
+	
+    private String tratarTexto(String texto) {
+		texto = texto.replace("Av. ", "Avenida ");
+		texto = texto.replace("R. ", "Rua ");
+		return texto;
+    }
+	
 }
