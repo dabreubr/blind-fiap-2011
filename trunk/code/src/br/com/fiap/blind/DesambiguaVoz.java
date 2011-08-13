@@ -29,7 +29,6 @@ public class DesambiguaVoz extends Activity implements TextToSpeech.OnInitListen
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.list);
         ttsInitialized = false;
         
         lista = new ArrayList<String>();
@@ -146,8 +145,10 @@ public class DesambiguaVoz extends Activity implements TextToSpeech.OnInitListen
 			
 			while (it.hasNext()) {
 				String resposta = (String) it.next();
-				if (resposta.equalsIgnoreCase("sim") ||
-						resposta.equalsIgnoreCase("tim")) {
+				if (resposta.contains("sim") ||
+						resposta.contains("tim") ||
+						resposta.contains("sin") ||
+						resposta.contains("sym")) {
 					pararPerguntar = true;
 					break;
 				}

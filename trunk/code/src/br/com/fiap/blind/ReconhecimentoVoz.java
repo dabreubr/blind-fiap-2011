@@ -24,16 +24,14 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
 		super.onCreate(savedInstanceState);
-        setContentView(R.layout.list);
 	}
 	
 	@Override
 	protected void onStart()
 	{
 		super.onStart();
-		
+		setContentView(R.layout.main);
         ttsInitialized = false;
 		mTts = new TextToSpeech(this, this);
         waitForInitLock.lock();
@@ -42,7 +40,13 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
 	@Override
 	protected void onDestroy()
 	{
-		mTts.shutdown();
+        // Don't forget to shutdown!
+        if (mTts != null) {
+            mTts.stop();
+            mTts.shutdown();
+        }
+
+        super.onDestroy();
 	}
 	
     @Override
@@ -66,12 +70,9 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
 	            Intent itEndereco = new Intent(this, Endereco.class);
 	            itEndereco.putExtra("endereco", endereco);
 	            startActivity(itEndereco);
+	            finish();
 			 }
-			 
 		 }
- 
-        super.onActivityResult(requestCode, resultCode, data);
-        
     }
     
     public void onInit(int status) {

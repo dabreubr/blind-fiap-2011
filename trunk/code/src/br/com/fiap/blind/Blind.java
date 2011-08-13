@@ -16,12 +16,9 @@ import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
-import android.widget.TextView;
 
 public class Blind extends Activity implements LocationListener, TextToSpeech.OnInitListener, TextToSpeech.OnUtteranceCompletedListener  {
 
-    private TextView txtlatitude = null;
-    private TextView txtlongitude = null;
     private TextToSpeech mTts;
     private ReentrantLock waitForInitLock = new ReentrantLock();
     private boolean ttsInitialized = false;
@@ -32,9 +29,6 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         
-        txtlatitude = (TextView) findViewById(R.id.latitude);
-        txtlongitude = (TextView) findViewById(R.id.longitude);
-     
         // Initialize text-to-speech. This is an asynchronous operation.
         // The OnInitListener (second argument) is called after initialization completes.
         mTts = new TextToSpeech(this,
@@ -49,6 +43,13 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
     public void onStart() {
     	super.onStart();
     	iniciarAplicacao();
+    }
+    
+    @Override
+    public void onStop() {
+        super.onStop();
+        
+        getLocationManager().removeUpdates(this);
     }
     
     public void iniciarAplicacao() {
@@ -78,17 +79,16 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
     		else {
     			getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
     			getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-
+    			
+    			Location loc = getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
+    			if (loc != null) {
+    				Gps.setLatitude((Double) loc.getLatitude());
+    				Gps.setLongitude((Double) loc.getLongitude());
+    			}
     			Intent itVoz = new Intent(this, ReconhecimentoVoz.class);
     			startActivity(itVoz);
     		}
     	}
-    }
-    
-    @Override
-    public void onDestroy() {
-    	super.onDestroy();
-    	getLocationManager().removeUpdates(this);
     }
     
     private void alertaGPSDesativado(){  
@@ -150,9 +150,28 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
     }
 
 	@Override
+	public void onInit(int status) {
+    	// status can be either TextToSpeech.SUCCESS or TextToSpeech.ERROR.
+    	if (status == TextToSpeech.SUCCESS) {
+    		//unlock it so that speech will happen 
+            waitForInitLock.unlock(); 
+    		ttsInitialized = true;
+    		iniciarAplicacao();
+    	} else {
+    		// Initialization failed.
+    		Log.e("DesambiguaVoz", "Could not initialize TextToSpeech.");
+    	}
+		
+	}
+
+	@Override
+	public void onUtteranceCompleted(String utteranceId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
 	public void onLocationChanged(Location location) {
-		txtlatitude.setText(((Double) location.getLatitude()).toString());
-		txtlongitude.setText(((Double) location.getLongitude()).toString());
 		Gps.setLatitude((Double) location.getLatitude());
 		Gps.setLongitude((Double) location.getLongitude());
 	}
@@ -171,27 +190,6 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
 
 	@Override
 	public void onStatusChanged(String provider, int status, Bundle extras) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	@Override
-	public void onInit(int status) {
-    	// status can be either TextToSpeech.SUCCESS or TextToSpeech.ERROR.
-    	if (status == TextToSpeech.SUCCESS) {
-    		//unlock it so that speech will happen 
-            waitForInitLock.unlock(); 
-    		ttsInitialized = true;
-    		iniciarAplicacao();
-    	} else {
-    		// Initialization failed.
-    		Log.e("DesambiguaVoz", "Could not initialize TextToSpeech.");
-    	}
-		
-	}
-
-	@Override
-	public void onUtteranceCompleted(String utteranceId) {
 		// TODO Auto-generated method stub
 		
 	}
