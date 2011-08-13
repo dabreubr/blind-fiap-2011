@@ -15,7 +15,7 @@ public class Endereco extends Activity {
 
 	private List<Address> address, addressOrigem;
 	private ArrayList<String> enderecos;
-	private String paramEndereco, origem;
+	private String paramEndereco;
 	private static final int DESAMBIGUA_VOZ = 1;
 	
 	@Override
@@ -34,28 +34,21 @@ public class Endereco extends Activity {
         Geocoder geocoder = new Geocoder(this);
         try {
         	addressOrigem = geocoder.getFromLocation(Gps.getLatitude(), Gps.getLongitude(), 1);
-    		String ruaOrigem = addressOrigem.get(0).getThoroughfare();
-    		String bairroOrigem = addressOrigem.get(0).getLocality();
-    		String ufOrigem = addressOrigem.get(0).getAdminArea();
-    		origem = ruaOrigem + " - " + bairroOrigem + " - " + ufOrigem;
+    		Gps.setEnderecoOrigem(addressOrigem.get(0));
     		
 		} catch (IOException e1) {
-			// TODO Auto-generated catch block
 			Log.e("GeocoderLog", "Deu erro o geo coder origem - " + e1.getMessage());
 		}
 		
         try {
-        	Double lowerLeftLatitude = Gps.getLatitude() + 1;
-        	Double upperRightLatitude = Gps.getLatitude() - 1;
-        	Double lowerLeftLongitude = Gps.getLongitude() + 1; 
-        	Double upperRightLongitude = Gps.getLongitude() - 1;
-        	address = geocoder.getFromLocationName(paramEndereco + " - SP", 3, lowerLeftLatitude,
-        			lowerLeftLongitude, upperRightLatitude, upperRightLongitude);
+        	address = geocoder.getFromLocationName(paramEndereco + " - SP", 3);
         	for (int i=0; i < address.size(); i++) {
-        		String rua = tratarTexto(address.get(i).getThoroughfare());
-        		String bairro = address.get(i).getLocality();
-        		String uf = address.get(i).getAdminArea();
-        		enderecos.add(rua + " - " + bairro + " - " + uf);
+        		if (address.get(i).getThoroughfare() != null) {
+        			String rua = tratarTexto(address.get(i).getThoroughfare());
+        			String bairro = address.get(i).getLocality();
+        			String uf = address.get(i).getAdminArea();
+        			enderecos.add(rua + " - " + bairro + " - " + uf);
+        		}
         	}
    	
         	Intent itDesambiguaVoz = new Intent(this, DesambiguaVoz.class);
@@ -73,9 +66,8 @@ public class Endereco extends Activity {
 				 String endereco = data.getStringExtra("texto");
 				 if (endereco != null)
 					 if (!endereco.equals("")) {
-						 Intent itRota = new Intent(this, Rota.class);
-						 itRota.putExtra("destino", endereco);
-						 itRota.putExtra("origem", origem);
+						 Intent itRota = new Intent(this, MapRouteActivity.class);
+						 Gps.setEnderecoDestino(address.get(enderecos.indexOf(endereco)));
 				         startActivity(itRota);
 				         finish();
 					 } else 
@@ -90,6 +82,8 @@ public class Endereco extends Activity {
     private String tratarTexto(String texto) {
 		texto = texto.replace("Av. ", "Avenida ");
 		texto = texto.replace("R. ", "Rua ");
+		texto = texto.replace("Estr. ", "Estrada ");
+		texto = texto.replace("Gen. ", "General ");
 		return texto;
     }
 	
