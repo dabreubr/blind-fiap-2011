@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string name="hello">Hello World, CadastroRotasActivity!</string>
-    <string name="app_name">CadastroRotas</string>
-    <string name="Linha">Linha</string>
-    <string name="Onibus">Onibus</string>
-    <string name="Iniciar">Iniciar</string>
-    <string name="Resultado">Resultado</string>
-</resources>
