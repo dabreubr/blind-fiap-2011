@@ -9,12 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
-import org.ci.geo.route.android.R;
-import org.ci.geo.route.android.R.drawable;
-import org.ci.geo.route.android.R.id;
-import org.ci.geo.route.android.R.layout;
-
-
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -34,6 +28,8 @@ import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
 import android.widget.TextView;
+
+import br.com.fiap.simuladorblind.R;
 
 import com.google.android.maps.GeoPoint;
 import com.google.android.maps.MapActivity;
