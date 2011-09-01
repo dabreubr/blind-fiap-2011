@@ -3,6 +3,6 @@
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    >
+    android:keepScreenOn="true">
 <ListView android:layout_height="wrap_content" android:layout_width="match_parent" android:id="@+id/list" android:layout_x="0dip" android:layout_y="77dip"></ListView>    
 </LinearLayout>

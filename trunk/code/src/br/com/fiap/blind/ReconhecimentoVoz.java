@@ -131,7 +131,7 @@ public class ReconhecimentoVoz extends Activity implements TextToSpeech.OnInitLi
     		intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
     		intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Diga o endereço de destino");
     		Vibrator v = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-    		v.vibrate(1000);
+    		v.vibrate(1500);
     		startActivityForResult(intent, VOICE_RECOGNITION_REQUEST_CODE);
     	}
 	}
