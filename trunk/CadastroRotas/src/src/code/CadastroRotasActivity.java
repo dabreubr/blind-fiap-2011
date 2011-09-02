@@ -1,5 +1,8 @@
 package src.code;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.ksoap2.serialization.SoapPrimitive;
 import android.app.Activity;
 import android.content.Context;
 import android.location.Location;
@@ -16,9 +19,12 @@ public class CadastroRotasActivity extends Activity implements OnClickListener, 
 
 	private final String url = "http://goomedia.com.br/sptrans/ServicoRotas.asmx";
 	private final String metodoInserePosicaoOnibus = "InserePosicaoOnibus";
+	//private final String metodoLimparPosicaoOnibus  = "LimparPosicaoOnibus";
+	//private final String metodoRetornaPosicaoOnibus  = "RetornaPosicaoOnibus";
+	private final String metodoRetornaPosicaoOnibusNovo  = "RetornaPosicaoOnibusNovo";
 	private TextView txtLinha, txtOnibus, txtResultado;
 	private Button btnIniciar;
-
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 
@@ -49,10 +55,8 @@ public class CadastroRotasActivity extends Activity implements OnClickListener, 
 	
 	@Override
 	public void onClick(View view) {
-		
 		getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 		getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-		
 	}
 	
 	private LocationManager getLocationManager() {
@@ -68,6 +72,49 @@ public class CadastroRotasActivity extends Activity implements OnClickListener, 
 			final String retorno = spTransWs.inserePosicaoOnibus(linha, onibus, coordenadaX, coordenadaY);
 			
 			txtResultado.setText("Retorno: " + retorno + "\nlinha: " + linha + "\nonibus:" + onibus + "\ncoordenadaX:" + coordenadaX + "\ncoordenadaY:" + coordenadaY);
+			txtResultado.setVisibility(View.VISIBLE);
+		}
+		catch(Exception ex)
+		{
+			Log.i("Erro: ", ex.getMessage());
+			txtResultado.setText("Erro: " + ex.getMessage());
+			txtResultado.setVisibility(View.VISIBLE);
+		}
+	}
+	
+	public void retornaPosicaoOnibus(String linha, String onibus)
+	{
+		try
+		{
+
+			SPTransWS spTransWs = new SPTransWS(url, metodoRetornaPosicaoOnibusNovo);
+			final Object retorno = spTransWs.retornaPosicaoOnibus(linha, onibus);
+
+			// Resultado do método do webservice           
+			SoapPrimitive s = (SoapPrimitive)retorno;                    
+
+			// Cria um array JSON para percorrer os registros
+			JSONArray jaOnibus = new JSONArray(s.toString());
+			
+			String resultado = "";
+			
+			for (int i=0; i < jaOnibus.length(); i++) {
+				
+				if (jaOnibus.getJSONObject(i) != null) {
+					JSONObject json = jaOnibus.getJSONObject(i);
+					
+					PosicaoOnibus posicaoOnibus = new PosicaoOnibus();
+					posicaoOnibus.setIdPosicaoOnibus(json.getString("idPosicaoOnibus"));
+					posicaoOnibus.setLinha(json.getString("linha"));
+					posicaoOnibus.setOnibus(json.getString("onibus"));
+					posicaoOnibus.setCoordenadaX(json.getString("coordenadaX"));
+					posicaoOnibus.setCoordenadaY(json.getString("coordenadaY"));
+					
+					resultado += posicaoOnibus.toString();
+				}
+			}
+
+			txtResultado.setText("Retorno\n" + resultado);
 			txtResultado.setVisibility(View.VISIBLE);
 		}
 		catch(Exception ex)

@@ -2,6 +2,8 @@ package src.code;
 
 import java.io.IOException;
 import org.ksoap2.SoapEnvelope;
+import org.ksoap2.serialization.Marshal;
+import org.ksoap2.serialization.MarshalFloat;
 import org.ksoap2.serialization.SoapObject;
 import org.ksoap2.serialization.SoapSerializationEnvelope;
 import org.ksoap2.transport.HttpTransportSE;
@@ -58,22 +60,31 @@ public class SPTransWS {
 		return rota.toString();
 	}
 
-	public String retornaPosicaoOnibus(String linha, String onibus) throws IOException, XmlPullParserException{
-		Object rota;
-		
-		SoapObject soap = new SoapObject(nameSpace, metodo);
-		soap.addProperty("linha", linha);
-		soap.addProperty("onibus", onibus);
-		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
-		envelope.dotNet = true;
-		envelope.setOutputSoapObject(soap);
-		Log.i(TAG, "Chamando WebService " + url);
-		HttpTransportSE httpTransport = new SPTransHttpTransport(url);
-		httpTransport.call(metodoSOAPAction, envelope);
-		rota = envelope.getResponse();
-		Log.i(TAG, "Retorno: " + rota.toString());
-		
-		return rota.toString();
+	public Object retornaPosicaoOnibus(String linha, String onibus){
+
+		try
+		{
+			SoapObject soap = new SoapObject(nameSpace, metodo);
+			soap.addProperty("linha", linha);
+			soap.addProperty("onibus", onibus);
+			SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
+			envelope.dotNet = true;
+			envelope.setOutputSoapObject(soap);
+			Log.i(TAG, "Chamando WebService " + url);
+			HttpTransportSE httpTransport = new SPTransHttpTransport(url);
+			httpTransport.debug = true;
+			httpTransport.call(metodoSOAPAction, envelope);
+
+			// Resultado do método do webservice           
+			return envelope.getResponse();                    
+
+		}
+		catch(Exception ex)
+		{
+			ex.printStackTrace();
+			return ex.getMessage();
+		}
+
 	}
 	
 	public String tracarRota(String enderecoOrigem, String enderecoDestino) throws IOException, XmlPullParserException{
@@ -84,6 +95,10 @@ public class SPTransWS {
 		soap.addProperty("enderecoDestino", enderecoDestino);
 		SoapSerializationEnvelope envelope = new SoapSerializationEnvelope(SoapEnvelope.VER11);
 		envelope.dotNet = true;
+		
+	    Marshal floatMarshal = new MarshalFloat();
+	    floatMarshal.register(envelope);
+		
 		envelope.setOutputSoapObject(soap);
 		Log.i(TAG, "Chamando WebService " + url);
 		HttpTransportSE httpTransport = new SPTransHttpTransport(url);
