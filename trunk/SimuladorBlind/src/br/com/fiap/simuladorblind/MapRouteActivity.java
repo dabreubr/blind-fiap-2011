@@ -9,6 +9,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.ksoap2.serialization.SoapPrimitive;
+
+import br.com.fiap.simuladorblind.PosicaoOnibus;
+import br.com.fiap.simuladorblind.SPTransWS;
+
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -27,6 +34,7 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
+import android.view.View;
 import android.widget.TextView;
 
 import br.com.fiap.simuladorblind.R;
@@ -42,7 +50,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 	private MapView mapView;
 	private Road mRoad;
 	private Handler handler = new Handler();
-	private int Tempo = 5000;
+	private int Tempo = 500;
 	private String enderecoFinal;
 	private boolean trocouOnibus, chegouAoPonto, aguardarOnibus, noOnibus, chegouAoDestino;
 	private Transporte transporte;
@@ -78,7 +86,9 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 	private boolean ttsInitialized = false;
 	private Geocoder geocoder;
 	private List<Address> listAddressDesembarque = null;
-
+	private String metodoTracarRota="TracarRota";
+	private String metodoRetornaPosicaoOnibusNovo="RetornaPosicaoOnibusNovo";
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -109,9 +119,9 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 			getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
-			SPTransWS sptrans = new SPTransWS(URL);
+			SPTransWS sptrans = new SPTransWS(URL, metodoTracarRota);
 			try {
-				final String rota = sptrans.calcularRota("Rua Dr. Oscar Tollens", "Avenida Lins de Vasconcellos");
+				final String rota = sptrans.tracarRota("Rua Dr. Oscar Tollens", "Avenida Lins de Vasconcellos");
 				tratarResposta(rota);
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -149,6 +159,9 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 		texto = texto.replace("PCA. ", "PRAÇA ");
 		texto = texto.replace("ESTR. ", "ESTRADA ");
 		texto = texto.replace("GEN. ", "GENERAL ");
+		texto = texto.replace("Av. ", "Avenida ");
+		texto = texto.replace("S. ", "São ");
+		texto = texto.replace("R. ", "Rua ");
 		return texto;
 	}
 
@@ -232,7 +245,8 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			}
 
 			if (aguardarOnibus) {
-				// Espera onibus chegar via WebService
+				String linha = transporte.getLinha().substring(0, transporte.getLinha().indexOf(" "));
+				retornaPosicaoOnibus(linha, "", latitude, longitude);
 				aguardarOnibus = false;
 				noOnibus = true;
 			}
@@ -274,11 +288,117 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 		}
 	}
 
+	public void retornaPosicaoOnibus(String linha, String onibus, Double latitude, Double longitude)
+	{
+		ArrayList<PosicaoOnibus> posicaoOnibusList = new ArrayList<PosicaoOnibus>();
+		try
+		{
+			SPTransWS spTransWs = new SPTransWS(URL, metodoRetornaPosicaoOnibusNovo);
+			final Object retorno = spTransWs.retornaPosicaoOnibus(linha, onibus);
+
+			// Resultado do método do webservice           
+			SoapPrimitive s = (SoapPrimitive)retorno;                    
+
+			// Cria um array JSON para percorrer os registros
+			JSONArray jaOnibus = new JSONArray(s.toString());
+
+			for (int i=0; i < jaOnibus.length(); i++) {
+
+				if (jaOnibus.getJSONObject(i) != null) {
+					JSONObject json = jaOnibus.getJSONObject(i);
+
+					PosicaoOnibus posicaoOnibus = new PosicaoOnibus();
+					posicaoOnibus.setIdPosicaoOnibus(json.getString("idPosicaoOnibus"));
+					posicaoOnibus.setLinha(json.getString("linha"));
+					posicaoOnibus.setOnibus(json.getString("onibus"));
+					posicaoOnibus.setCoordenadaX(json.getString("coordenadaX")); // latitude 
+					posicaoOnibus.setCoordenadaY(json.getString("coordenadaY")); // longitude
+					posicaoOnibusList.add(posicaoOnibus);
+				}
+			}
+			ArrayList<Double> distancias = new ArrayList<Double>();
+			double distanciaAnterior=-1;
+			int menorDistancia = 0;
+			for (int i=0; i < posicaoOnibusList.size(); i++) {
+				PosicaoOnibus posicaoOnibus = posicaoOnibusList.get(i);
+				double busLat = posicaoOnibus.getLatitude();
+				double busLon = posicaoOnibus.getLongitude();
+				Location localAtual = new Location("reverseGeocoded");
+				Location localOnibus = new Location("reverseGeocoded");
+				localAtual.setLatitude(latitude);
+				localAtual.setLongitude(longitude);
+				localOnibus.setLatitude(busLat);
+				localOnibus.setLongitude(busLon);
+				distancias.add(new Double(localAtual.distanceTo(localOnibus)));
+			}
+			if (distancias.size() > 0) {
+				for(int i=0; i < distancias.size(); i++) {
+					if (i==0) {
+						distanciaAnterior = distancias.get(i);
+					} else {
+						if (distanciaAnterior > distancias.get(i)) {
+							distanciaAnterior = distancias.get(i);
+							menorDistancia = i;
+						}
+					}
+				}
+				PosicaoOnibus posicaoOnibus = posicaoOnibusList.get(menorDistancia);
+				onibus = posicaoOnibus.getOnibus();
+				PosicaoOnibus posicaoOnibusMaisPerto = null;
+				while (true) {
+					final Object retornoOnibus = spTransWs.retornaPosicaoOnibus(linha, onibus);
+
+					// Resultado do método do webservice           
+					s = (SoapPrimitive)retornoOnibus;                    
+
+					// Cria um array JSON para percorrer os registros
+					jaOnibus = new JSONArray(s.toString());
+					
+					for (int i=0; i < jaOnibus.length(); i++) {
+
+						if (jaOnibus.getJSONObject(i) != null) {
+							JSONObject json = jaOnibus.getJSONObject(i);
+
+							posicaoOnibusMaisPerto = new PosicaoOnibus();
+							posicaoOnibusMaisPerto.setIdPosicaoOnibus(json.getString("idPosicaoOnibus"));
+							posicaoOnibusMaisPerto.setLinha(json.getString("linha"));
+							posicaoOnibusMaisPerto.setOnibus(json.getString("onibus"));
+							posicaoOnibusMaisPerto.setCoordenadaX(json.getString("coordenadaX")); // latitude
+							posicaoOnibusMaisPerto.setCoordenadaY(json.getString("coordenadaY")); // longitude
+						}
+					}
+					double busLat = posicaoOnibusMaisPerto.getLatitude();
+					double busLon = posicaoOnibusMaisPerto.getLongitude();
+					Location localAtual = new Location("reverseGeocoded");
+					Location localOnibus = new Location("reverseGeocoded");
+					localAtual.setLatitude(latitude);
+					localAtual.setLongitude(longitude);
+					localOnibus.setLatitude(busLat);
+					localOnibus.setLongitude(busLon);
+					Double distanciaDoOnibus = new Double(localAtual.distanceTo(localOnibus));
+					if (distanciaDoOnibus < 100.00) {
+						falar("O " + transporte.getTipo() + " está a " + distanciaDoOnibus + " metros de distância");
+						if (distanciaDoOnibus < 10.00) {
+							falar("O " + transporte.getTipo() + " da linha " + transporte.getLinha() + " chegou ao ponto");
+							break;
+						}
+					}
+				}
+			}
+		}
+		catch(Exception ex)
+		{
+			Log.i("Erro: ", ex.getMessage());
+		}
+	}
+	
 	public void falar(String fala) {
 		fala = tratarTexto(fala);
 		textView.setText(fala);
-		fala = fala.replace("\n", "");
-		mTts.speak(fala, TextToSpeech.QUEUE_ADD, null);
+		String falaVetor[] = fala.split("\n");
+		for (int i=0;i<falaVetor.length;i++) {
+			//mTts.speak(falaVetor[i], TextToSpeech.QUEUE_ADD, null);
+		}
 	}
 
 	public void obterMapaeRota(double fromLat, double fromLon, double toLat, double toLon) {
