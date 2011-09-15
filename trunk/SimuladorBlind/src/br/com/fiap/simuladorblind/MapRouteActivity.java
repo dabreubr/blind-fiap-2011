@@ -34,7 +34,6 @@ import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
-import android.view.View;
 import android.widget.TextView;
 
 import br.com.fiap.simuladorblind.R;
@@ -46,13 +45,14 @@ import com.google.android.maps.Overlay;
 
 public class MapRouteActivity extends MapActivity implements LocationListener, Runnable, OnInitListener {
 
+	private final String TAG = "MapRouteActivity";
 	private int indiceOnibus;
 	private MapView mapView;
 	private Road mRoad;
 	private Handler handler = new Handler();
-	private int Tempo = 500;
+	private int Tempo = 5000;
 	private String enderecoFinal;
-	private boolean trocouOnibus, chegouAoPonto, aguardarOnibus, noOnibus, chegouAoDestino;
+	private boolean trocouOnibus, chegouAoPonto, aguardarOnibus, noOnibus, chegouAoDestino, obteveRotaOnibus;
 	private Transporte transporte;
 	private ArrayList<Transporte> transportes = new ArrayList<Transporte>();
 	private static final String URL = "http://goomedia.com.br/sptrans/ServicoRotas.asmx";
@@ -62,6 +62,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			{-46.794310,-23.603750},
 			{-46.794350,-23.603650},
 			{-46.794430,-23.603540}, // voz
+			// {-46.795000,-23.604910} // Testes para recalcular rota
 			{-46.794370,-23.603480},
 			{-46.794270,-23.603380},
 			{-46.794270,-23.603280},
@@ -77,7 +78,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			{-46.632370,-23.565110},{-46.632300,-23.566050},{-46.632300,-23.566050},{-46.631370,-23.565390},{-46.631370,-23.565390},{-46.630040,-23.566820},{-46.629440,-23.567570},{-46.629440,-23.567570},{-46.629080,-23.567450},{-46.628330,-23.567870},{-46.625830,-23.569860},{-46.625830,-23.569860},{-46.624950,-23.570000},{-46.624950,-23.570000},{-46.625220,-23.571300},{-46.625220,-23.571300},{-46.624050,-23.571510},{-46.624050,-23.571510},
 			{-46.624180,-23.572040}, // chegou ao enderecoDesembarque2
 			{-46.624180,-23.572040},{-46.624460,-23.573200},{-46.624580,-23.573920},{-46.624580,-23.573920},{-46.624280,-23.573970},{-46.624090,-23.573900},{-46.623630,-23.573980},{-46.623490,-23.574100},
-			{-46.623210,-23.574150} // chegou ao enderecoFinal
+			{-46.623210,-23.574150} // chegou ao enderecoFinal */
 	};
 	private int posicao = 0;
 	TextView textView;
@@ -88,6 +89,8 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 	private List<Address> listAddressDesembarque = null;
 	private String metodoTracarRota="TracarRota";
 	private String metodoRetornaPosicaoOnibusNovo="RetornaPosicaoOnibusNovo";
+	private int geoPointSeguinte;
+	private Double distanciaAnterior = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -112,6 +115,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			geocoder = new Geocoder(this);
 			trocouOnibus = true;
 			aguardarOnibus = false;
+			obteveRotaOnibus = false;
 			setContentView(R.layout.main);
 			mapView = (MapView) findViewById(R.id.mapview);
 			textView = (TextView) findViewById(R.id.description);
@@ -119,15 +123,19 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
 			getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
 
-			SPTransWS sptrans = new SPTransWS(URL, metodoTracarRota);
-			try {
-				final String rota = sptrans.tracarRota("Rua Dr. Oscar Tollens", "Avenida Lins de Vasconcellos");
-				tratarResposta(rota);
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
+			consumirSPTransWS(); 
 
 			handler.postDelayed(this, Tempo);
+		}
+	}
+	
+	private void consumirSPTransWS() {
+		try {
+			SPTransWS sptrans = new SPTransWS(URL, metodoTracarRota);
+			final String rota = sptrans.tracarRota("Rua Dr. Oscar Tollens", "Avenida Lins de Vasconcellos");
+			tratarResposta(rota);
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 
@@ -145,6 +153,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			transportes.add(transporte);
 			i++;
 		}
+		obteveRotaOnibus = true;
 	}
 
 	private String tratarTexto(String texto) {
@@ -169,118 +178,154 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 	@Override
 	public void run() {
 		try {
-			if (posicao == coordenadas.length)
-				posicao = 0;
-			double latitude = (coordenadas[posicao][1]);
-			double longitude = (coordenadas[posicao][0]);
-			int latitudeInt = (int) (latitude*1E6);
-			int longitudeInt = (int) (longitude*1E6);
-			int latitudeAprox = (int) (latitude*1E4);
-			int longitudeAprox = (int) (longitude*1E4);
+			if (obteveRotaOnibus) {
+				if (posicao == coordenadas.length)
+					posicao = 0;
+				double latitude = (coordenadas[posicao][1]);
+				double longitude = (coordenadas[posicao][0]);
+				int latitudeInt = (int) (latitude*1E6);
+				int longitudeInt = (int) (longitude*1E6);
+				int latitudeAprox = (int) (latitude*1E4);
+				int longitudeAprox = (int) (longitude*1E4);
 
-			if (trocouOnibus) {
-				aguardarOnibus = false;
-				List<Address> listAddress = null;
-				if (transportes.size() > indiceOnibus) {
-					transporte = transportes.get(indiceOnibus);
-					listAddress = geocoder.getFromLocationName(transporte.getEmbarque(), 1);
-				} else {
-					listAddress = geocoder.getFromLocationName(enderecoFinal, 1);
-				}
-				double toLat = listAddress.get(0).getLatitude();
-				double toLon = listAddress.get(0).getLongitude();
-				obterMapaeRota(latitude, longitude, toLat, toLon);
-				trocouOnibus = false;
-			}	
-
-			if (mRoad != null) {
-				mapView.getOverlays().clear();
-				mapView.getOverlays().add(new RouteOverlay(mRoad, mapView));
-				mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
-				mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
-				mapView.getController().setZoom(21);
-				mapView.invalidate();
-				for (int i=0; i<mRoad.mPoints.length; i++) {
-					if (((int) (mRoad.mPoints[i].getmLatitude()*1E4) == latitudeAprox) &&
-							((int) (mRoad.mPoints[i].getmLongitude()*1E4) == longitudeAprox)) {
-						String fala = null;
-						if (mRoad.mPoints[i].getmName() != null)
-							fala = mRoad.mPoints[i].getmName();
-						if (mRoad.mPoints[i].getmDescription() != null)
-							fala = fala + " \n" + mRoad.mPoints[i].getmDescription();
-						if (fala != null) {
-							falar(fala);
-							if (fala.startsWith("Chegar em:"))
-								if (transportes.size() > indiceOnibus) 
-									chegouAoPonto = true;
-								else
-									chegouAoDestino = true;
+				if (mRoad != null) { // se a pé recalculo rota, se necessario
+					if ((!chegouAoPonto) || (!chegouAoDestino)) { // somente se nao chegou ao destino do subTrajeto
+						Location localAtual = new Location("reverseGeocoded");
+						Location localSeguinte = new Location("reverseGeocoded");
+						localAtual.setLatitude(latitude);
+						localAtual.setLongitude(longitude);
+						localSeguinte.setLatitude(mRoad.mPoints[geoPointSeguinte].getmLatitude());
+						localSeguinte.setLongitude(mRoad.mPoints[geoPointSeguinte].getmLongitude());
+						Double distancia = new Double(localAtual.distanceTo(localSeguinte));
+						if (distanciaAnterior != null) {
+							if (distancia > distanciaAnterior) { // se aumentou a distancia recalcula a rota
+								// sempre altera essas variaveis para poder recalcular rota
+								trocouOnibus = true;
+								mRoad = null;
+							}
 						}
-						break;
+						distanciaAnterior = new Double(distancia);
 					}
 				}
-			} else {
-				mapView.getOverlays().clear();
-				mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
-				mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
-				mapView.getController().setZoom(21);
-				mapView.invalidate();
-			}
+				
+				if (trocouOnibus) {
+					aguardarOnibus = false;
+					List<Address> listAddress = null;
+					if (transportes.size() > indiceOnibus) {
+						transporte = transportes.get(indiceOnibus);
+						listAddress = geocoder.getFromLocationName(transporte.getEmbarque(), 1);
+					} else {
+						listAddress = geocoder.getFromLocationName(enderecoFinal, 1);
+					}
+					double toLat = listAddress.get(0).getLatitude();
+					double toLon = listAddress.get(0).getLongitude();
+					obterMapaeRota(latitude, longitude, toLat, toLon);
+					trocouOnibus = false;
+				}	
 
-			if (chegouAoPonto) {
-				String fala;
-				fala = "Você chegou ao ponto de " + transporte.getTipo() + 
-				" \nPegue o " + transporte.getTipo() + 
-				" " + transporte.getLinha();
-				falar(fala);
-				mRoad = null;
-				chegouAoPonto = false;
-				aguardarOnibus = true;
-			}
+				if (mRoad != null) {
+					mapView.getOverlays().clear();
+					mapView.getOverlays().add(new RouteOverlay(mRoad, mapView));
+					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
+					mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
+					mapView.getController().setZoom(21);
+					mapView.invalidate();
+					for (int i=0; i<mRoad.mPoints.length; i++) {
+						if (((int) (mRoad.mPoints[i].getmLatitude()*1E4) == latitudeAprox) &&
+								((int) (mRoad.mPoints[i].getmLongitude()*1E4) == longitudeAprox)) {
 
-			if (chegouAoDestino) {
-				falar("Você chegou ao seu destino \n" + enderecoFinal);
-				mRoad = null;
-				chegouAoDestino = false;
-			}
+							geoPointSeguinte = i+1;
+							
+							Location localAtual = new Location("reverseGeocoded");
+							Location localSeguinte = new Location("reverseGeocoded");
+							localAtual.setLatitude(latitude);
+							localAtual.setLongitude(longitude);
+							localSeguinte.setLatitude(mRoad.mPoints[geoPointSeguinte].getmLatitude());
+							localSeguinte.setLongitude(mRoad.mPoints[geoPointSeguinte].getmLongitude());
+							distanciaAnterior = new Double(localAtual.distanceTo(localSeguinte));
+							
+							String fala = null;
+							if (mRoad.mPoints[i].getmName() != null)
+								fala = mRoad.mPoints[i].getmName();
+							if (mRoad.mPoints[i].getmDescription() != null)
+								fala = fala + " \n" + mRoad.mPoints[i].getmDescription();
+							if (fala != null) {
+								falar(fala);
+								if (fala.startsWith("Chegar em:"))
+									if (transportes.size() > indiceOnibus) 
+										chegouAoPonto = true;
+									else
+										chegouAoDestino = true;
+							}
+							break;
+						}
+					}
+				} else {
+					mapView.getOverlays().clear();
+					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
+					mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
+					mapView.getController().setZoom(21);
+					mapView.invalidate();
+				}
 
-			if (aguardarOnibus) {
-				String linha = transporte.getLinha().substring(0, transporte.getLinha().indexOf(" "));
-				retornaPosicaoOnibus(linha, "", latitude, longitude);
-				aguardarOnibus = false;
-				noOnibus = true;
-			}
+				if (chegouAoPonto) {
+					String fala;
+					fala = "Você chegou ao ponto de " + transporte.getTipo() + 
+					" \nPegue o " + transporte.getTipo() + 
+					" " + transporte.getLinha();
+					falar(fala);
+					mRoad = null;
+					chegouAoPonto = false;
+					aguardarOnibus = true;
+				}
 
-			if (noOnibus) {
-				if (listAddressDesembarque == null)
-					listAddressDesembarque = geocoder.getFromLocationName(transporte.getDesembarque(), 1);
-				else {
-					double toLat = listAddressDesembarque.get(0).getLatitude();
-					double toLon = listAddressDesembarque.get(0).getLongitude();
-					Location localAtual = new Location("reverseGeocoded");
-					Location localDesembarque = new Location("reverseGeocoded");
-					localAtual.setLatitude(latitude);
-					localAtual.setLongitude(longitude);
-					localDesembarque.setLatitude(toLat);
-					localDesembarque.setLongitude(toLon);
-					double distance = localAtual.distanceTo(localDesembarque);
-					if (distance <= 100.00) {
-						falar("A distância para o desembarque é de " + 
-								(int) distance + " metros.");
-						if ((int) distance <= 5) { // se distancia menor que 5 metros
-							falar("Desembarque no próximo ponto.");
-							if ((int) distance <= 2) { // se distancia menor que 5 metros
-								trocouOnibus = true;
-								indiceOnibus++;
-								noOnibus = false;
-								listAddressDesembarque = null;
+				if (chegouAoDestino) {
+					falar("Você chegou ao seu destino \n" + enderecoFinal);
+					mRoad = null;
+					chegouAoDestino = false;
+				}
+
+				if (aguardarOnibus) {
+					String linha = transporte.getLinha().substring(0, transporte.getLinha().indexOf(" "));
+					if (retornaPosicaoOnibus(linha, "", latitude, longitude)) {
+						aguardarOnibus = false;
+						noOnibus = true;
+					}
+				}
+
+				if (noOnibus) {
+					if (listAddressDesembarque == null)
+						listAddressDesembarque = geocoder.getFromLocationName(transporte.getDesembarque(), 1);
+					else {
+						double toLat = listAddressDesembarque.get(0).getLatitude();
+						double toLon = listAddressDesembarque.get(0).getLongitude();
+						Location localAtual = new Location("reverseGeocoded");
+						Location localDesembarque = new Location("reverseGeocoded");
+						localAtual.setLatitude(latitude);
+						localAtual.setLongitude(longitude);
+						localDesembarque.setLatitude(toLat);
+						localDesembarque.setLongitude(toLon);
+						double distance = localAtual.distanceTo(localDesembarque);
+						if (distance <= 100.00) {
+							falar("A distância para o desembarque é de " + 
+									(int) distance + " metros.");
+							if ((int) distance <= 5) { // se distancia menor que 5 metros
+								falar("Desembarque no próximo ponto.");
+								if ((int) distance <= 2) { // se distancia menor que 5 metros
+									trocouOnibus = true;
+									indiceOnibus++;
+									noOnibus = false;
+									listAddressDesembarque = null;
+								}
 							}
 						}
 					}
 				}
-			}
 
-			posicao++;
+				posicao++;
+			} else {
+				consumirSPTransWS();
+			}
 			if (posicao < coordenadas.length)
 				handler.postDelayed(this, Tempo);
 		} catch (Exception e) {
@@ -288,9 +333,10 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 		}
 	}
 
-	public void retornaPosicaoOnibus(String linha, String onibus, Double latitude, Double longitude)
+	public boolean retornaPosicaoOnibus(String linha, String onibus, Double latitude, Double longitude)
 	{
 		ArrayList<PosicaoOnibus> posicaoOnibusList = new ArrayList<PosicaoOnibus>();
+		boolean resultado = false;
 		try
 		{
 			SPTransWS spTransWs = new SPTransWS(URL, metodoRetornaPosicaoOnibusNovo);
@@ -380,6 +426,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 						falar("O " + transporte.getTipo() + " está a " + distanciaDoOnibus + " metros de distância");
 						if (distanciaDoOnibus < 10.00) {
 							falar("O " + transporte.getTipo() + " da linha " + transporte.getLinha() + " chegou ao ponto");
+							resultado = true;
 							break;
 						}
 					}
@@ -390,6 +437,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 		{
 			Log.i("Erro: ", ex.getMessage());
 		}
+		return resultado;
 	}
 	
 	public void falar(String fala) {
@@ -397,14 +445,15 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 		textView.setText(fala);
 		String falaVetor[] = fala.split("\n");
 		for (int i=0;i<falaVetor.length;i++) {
-			//mTts.speak(falaVetor[i], TextToSpeech.QUEUE_ADD, null);
+			mTts.speak(falaVetor[i], TextToSpeech.QUEUE_ADD, null);
 		}
 	}
 
 	public void obterMapaeRota(double fromLat, double fromLon, double toLat, double toLon) {
 		String url = RoadProvider.getUrl(fromLat, fromLon, toLat, toLon);
 		InputStream is = getConnection(url);
-		if (is!=null) { // alterar
+		if (is!=null) {
+			Log.i(TAG, url);
 			mRoad = RoadProvider.getRoute(is);
 			textView.setText(mRoad.mName + " " + mRoad.mDescription);
 			RouteOverlay routeOverlay = new RouteOverlay(mRoad, mapView);
@@ -535,7 +584,7 @@ class RouteOverlay extends com.google.android.maps.Overlay {
 		paint.setColor(Color.GREEN);
 		paint.setStyle(Paint.Style.STROKE);
 		paint.setStrokeWidth(3);
-		if (mPoints != null) { // alterado colocar no blind tambem
+		if (mPoints != null) { 
 			for (int i = 0; i < mPoints.size(); i++) {
 				Point point = new Point();
 				mv.getProjection().toPixels(mPoints.get(i), point);
