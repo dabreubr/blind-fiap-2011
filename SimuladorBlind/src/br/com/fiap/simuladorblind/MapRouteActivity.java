@@ -161,13 +161,13 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			texto = texto.substring(0, texto.length()-1);
 		if (texto.indexOf("REF.: ") > 0) 
 			texto = texto.substring(0, texto.indexOf("REF.: ") - 1);
-		texto = texto.replace("AV. ", "AVENIDA ");
-		texto = texto.replace("S. ", "SÃO ");
-		texto = texto.replace("R. ", "RUA ");
-		texto = texto.replace("PCA ", "PRAÇA ");
-		texto = texto.replace("PCA. ", "PRAÇA ");
-		texto = texto.replace("ESTR. ", "ESTRADA ");
-		texto = texto.replace("GEN. ", "GENERAL ");
+		texto = texto.replace("AV. ", "Avenida ");
+		texto = texto.replace("S. ", "São ");
+		texto = texto.replace("R. ", "Rua ");
+		texto = texto.replace("PCA ", "Praça ");
+		texto = texto.replace("PCA. ", "Praça ");
+		texto = texto.replace("ESTR. ", "Estrada ");
+		texto = texto.replace("GEN. ", "General ");
 		texto = texto.replace("Av. ", "Avenida ");
 		texto = texto.replace("S. ", "São ");
 		texto = texto.replace("R. ", "Rua ");
@@ -465,9 +465,17 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 	}
 
 	@Override
-	public void onDestroy() {
+	protected void onDestroy() {
 		super.onDestroy();
+		mTts.shutdown();
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
 		getLocationManager().removeUpdates(this);
+		mTts.stop();
+		finish();
 	}
 
 	private LocationManager getLocationManager() {
