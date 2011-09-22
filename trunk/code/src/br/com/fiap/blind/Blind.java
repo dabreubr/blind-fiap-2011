@@ -48,11 +48,19 @@ public class Blind extends Activity implements LocationListener, TextToSpeech.On
     @Override
     public void onStop() {
         super.onStop();
-        
         getLocationManager().removeUpdates(this);
+        mTts.stop();
+        finish();
     }
     
-    public void iniciarAplicacao() {
+    
+    @Override
+	protected void onDestroy() {
+		mTts.shutdown();
+		super.onDestroy();
+	}
+
+	public void iniciarAplicacao() {
     	if (ttsInitialized) {
     		if (!getLocationManager().isProviderEnabled(LocationManager.GPS_PROVIDER)) {
     			if (waitForInitLock.isLocked()) 
