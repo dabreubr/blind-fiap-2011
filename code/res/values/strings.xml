@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="hello">Olá, bem vindo ao Blind</string>
-    <string name="app_name">Blind</string>
+    <string name="app_name">iSee</string>
     <string name="gps_desativado">O GPS está desabilitado. Por favor habilitar.</string>
     <string name="config_gps">Mostrar configurações de local?</string>
     <string name="conexao_dados">Conexão de dados</string>
