@@ -6,6 +6,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -28,6 +29,7 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.util.Log;
@@ -44,13 +46,14 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 	
 	private final String TAG = "MapRouteActivity";
 	private int indiceOnibus;
-	private ProgressDialog dialog;
+	private ProgressDialog dialog = null;
 	private static final String URL = "http://goomedia.com.br/sptrans/ServicoRotas.asmx";
 	private TextView txtRota, txtDescription;
 	private MapView mapView;
 	private Rota mRota;
 	private String enderecoFinal;
-	private boolean trocouOnibus, chegouAoPonto, aguardarOnibus, noOnibus, chegouAoDestino, obteveRotaOnibus;
+	private boolean trocouOnibus, chegouAoPonto, aguardarOnibus, 
+	noOnibus, chegouAoDestino, obteveRotaOnibus, terminouAtualizaRota;
 	private Transporte transporte;
 	private ArrayList<Transporte> transportes = new ArrayList<Transporte>();
 	private TextToSpeech mTts;
@@ -92,19 +95,26 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 			trocouOnibus = true;
 			aguardarOnibus = false;
 			obteveRotaOnibus = false;
-    		getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, this);
-    		getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
-    		Location loc = getLocationManager().getLastKnownLocation(LocationManager.GPS_PROVIDER);
-    		if (loc != null) {
-    			setNewLocation(loc);
-    		}
+			terminouAtualizaRota = true;
 
-    		consumirSPTransWS();
+			consumirSPTransWS();
+
+			iniciarLocationListener();
+    	}
+    }
+    
+    private void iniciarLocationListener() {
+    	getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, this);
+    	getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+    	Location loc = getLocationManager().getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+    	if (loc != null) {
+    		setNewLocation(loc);
     	}
     }
     
     private void consumirSPTransWS() {
-    	dialog = ProgressDialog.show(this, "Aguarde", "Calculando rota");
+    	if (dialog == null)
+    		dialog = ProgressDialog.show(this, "Aguarde", "Calculando rota");
 		new Thread(this).start();
 	}
 
@@ -113,6 +123,8 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
         super.onStop();
         
         getLocationManager().removeUpdates(this);
+        mTts.stop();
+        mTts.shutdown();
     }
 
 	private LocationManager getLocationManager() {
@@ -123,11 +135,18 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 	@Override
 	public void run() {
 		try {
-			SPTransWS sptrans = new SPTransWS(URL, metodoTracarRota);
-			final String rota = sptrans.tracarRota(Gps.getStrEnderecoOrigem(), Gps.getStrEnderecoDestino());
-			tratarResposta(rota);		
+			if (!obteveRotaOnibus) {
+				SPTransWS sptrans = new SPTransWS(URL, metodoTracarRota);
+				//final String rota = sptrans.tracarRota(Gps.getStrEnderecoOrigem(), Gps.getStrEnderecoDestino());
+				// xxxxx
+				final String rota = sptrans.tracarRota("Rua Silvestre Lourenço da Silva - Osasco", 
+				"Avenida Lins de Vasconcellos - São Paulo - São Paulo");
+				tratarResposta(rota);
+				obteveRotaOnibus = true;
+				Log.i(TAG, rota);
+			}
 		} catch (Exception e) {
-			Log.e("Rota", e.getMessage(), e);
+			Log.e(TAG, e.getMessage(), e);
 		} finally {
 			dialog.dismiss();
 		}
@@ -147,7 +166,6 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 			transportes.add(transporte);
 			i++;
 		}
-		obteveRotaOnibus = true;
 	}
 
 	private String tratarTexto(String texto) {
@@ -155,13 +173,13 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 			texto = texto.substring(0, texto.length()-1);
 		if (texto.indexOf("REF.: ") > 0) 
 			texto = texto.substring(0, texto.indexOf("REF.: ") - 1);
-		texto = texto.replace("AV. ", "AVENIDA ");
-		texto = texto.replace("S. ", "SÃO ");
-		texto = texto.replace("R. ", "RUA ");
-		texto = texto.replace("PCA ", "PRAÇA ");
-		texto = texto.replace("PCA. ", "PRAÇA ");
-		texto = texto.replace("ESTR. ", "ESTRADA ");
-		texto = texto.replace("GEN. ", "GENERAL ");
+		texto = texto.replace("AV. ", "Avenida ");
+		texto = texto.replace("S. ", "São ");
+		texto = texto.replace("R. ", "Rua ");
+		texto = texto.replace("PCA ", "Praça ");
+		texto = texto.replace("PCA. ", "Praça ");
+		texto = texto.replace("ESTR. ", "Estrada ");
+		texto = texto.replace("GEN. ", "General ");
 		return texto;
 	}
 	
@@ -210,18 +228,35 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 	@Override
 	public void onLocationChanged(Location location) {
 		setNewLocation(location);
-		atualizaRota();
+		
+		if (terminouAtualizaRota) {
+			terminouAtualizaRota = false;
+			atualizaRota();
+		}
 	}
 
 	private void setNewLocation(Location location) {
 		Gps.setLatitude((Double) location.getLatitude());
 		Gps.setLongitude((Double) location.getLongitude());
+		
+		TextView txtPos = (TextView) findViewById(R.id.testePos);
+		String teste = "";
+		teste = "Lat:" + Gps.getLatitude().toString();
+		teste += "\nLon:" + Gps.getLongitude().toString();
+		Date d = new Date();
+		teste += "\nData:" + d.toString(); 
+		txtPos.setText(teste);
+		Log.i(TAG, teste);
 	}
 	
 	private void atualizaRota() {
 		try {
 			if (obteveRotaOnibus) {
-				txtRota.setText("Origem: " + Gps.getStrEnderecoOrigem() + " Destino: " + enderecoFinal);
+				Log.i(TAG, "Inicia atualizaRota()");
+				// txtRota.setText("Origem: " + Gps.getStrEnderecoOrigem() + " Destino: " + enderecoFinal);
+				// xxxxx
+				txtRota.setText("Origem: " + "Rua Silvestre Lourenço da Silva - Osasco"
+						+ " Destino: " + enderecoFinal);
 				double latitude = Gps.getLatitude();
 				double longitude = Gps.getLongitude();
 				int latitudeInt = (int) (latitude*1E6);
@@ -248,7 +283,7 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 						}
 						distanciaAnterior = new Double(distancia);
 					}
-				}
+				} 
 				
 				if (trocouOnibus) {
 					aguardarOnibus = false;
@@ -284,7 +319,7 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 							localSeguinte.setLatitude(mRota.mPoints[geoPointSeguinte].getmLatitude());
 							localSeguinte.setLongitude(mRota.mPoints[geoPointSeguinte].getmLongitude());
 							distanciaAnterior = new Double(localAtual.distanceTo(localSeguinte));
-							
+	
 							String fala = null;
 							if (mRota.mPoints[i].getmName() != null)
 								fala = mRota.mPoints[i].getmName();
@@ -301,9 +336,6 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 							break;
 						}
 					}
-					// sempre altera essas variaveis para poder recalcular rota 
-					trocouOnibus = true;
-					mRota = null;
 				} else {
 					mapView.getOverlays().clear();
 					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
@@ -365,11 +397,12 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 						}
 					}
 				}
-			} else {
-				consumirSPTransWS();
 			}
+			terminouAtualizaRota = true;
 		} catch (Exception e) {
 			e.printStackTrace();
+			Log.e(TAG, e.getMessage(), e);
+			terminouAtualizaRota = true;
 		}
 	}
 	
