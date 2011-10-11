@@ -7,8 +7,10 @@
                 android:layout_height="wrap_content"/>
         <TextView android:id="@+id/description" android:layout_width="fill_parent"
                 android:layout_height="wrap_content"/>
+        <TextView android:id="@+id/testePos" android:layout_width="fill_parent"
+                android:layout_height="wrap_content"/>
         <com.google.android.maps.MapView
                 android:id="@+id/mapview" android:layout_width="fill_parent"
                 android:layout_height="fill_parent" android:clickable="true"
-                android:apiKey="0KnGWJ_L8QcGQ4NF0iZHQ6ZRqG_MjjEpTb8olxw" />
+                android:apiKey="0KnGWJ_L8QcHwqHELaKnHIUpHqBRYS3bzn9wWgA" />
 </LinearLayout>
