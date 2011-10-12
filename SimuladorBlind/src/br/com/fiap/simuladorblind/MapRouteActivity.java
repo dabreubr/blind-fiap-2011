@@ -74,7 +74,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			{-46.642000,-23.547740}, // chegou ao enderecoDesembarque1
 			{-46.642000,-23.547740},{-46.642600,-23.547780},{-46.642600,-23.547780},{-46.642780,-23.547790},{-46.642780,-23.547790},
 			{-46.642950,-23.546980},
-			{-46.643021,-23.546609}, // chegou ao enderecoEmbarque2
+			{-46.643032,-23.546549}, // chegou ao enderecoEmbarque2
 			{-46.632370,-23.565110},{-46.632300,-23.566050},{-46.632300,-23.566050},{-46.631370,-23.565390},{-46.631370,-23.565390},{-46.630040,-23.566820},{-46.629440,-23.567570},{-46.629440,-23.567570},{-46.629080,-23.567450},{-46.628330,-23.567870},{-46.625830,-23.569860},{-46.625830,-23.569860},{-46.624950,-23.570000},{-46.624950,-23.570000},{-46.625220,-23.571300},{-46.625220,-23.571300},{-46.624050,-23.571510},{-46.624050,-23.571510},
 			{-46.624180,-23.572040}, // chegou ao enderecoDesembarque2
 			{-46.624180,-23.572040},{-46.624460,-23.573200},{-46.624580,-23.573920},{-46.624580,-23.573920},{-46.624280,-23.573970},{-46.624090,-23.573900},{-46.623630,-23.573980},{-46.623490,-23.574100},
@@ -200,6 +200,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 						if (distanciaAnterior != null) {
 							if (distancia > distanciaAnterior) { // se aumentou a distancia recalcula a rota
 								// sempre altera essas variaveis para poder recalcular rota
+								falar("Recalculando rota...");
 								trocouOnibus = true;
 								mRoad = null;
 							}
@@ -228,7 +229,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 					mapView.getOverlays().add(new RouteOverlay(mRoad, mapView));
 					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
 					mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
-					mapView.getController().setZoom(21);
+					mapView.getController().setZoom(20);
 					mapView.invalidate();
 					for (int i=0; i<mRoad.mPoints.length; i++) {
 						if (((int) (mRoad.mPoints[i].getmLatitude()*1E4) == latitudeAprox) &&
@@ -264,7 +265,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 					mapView.getOverlays().clear();
 					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
 					mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
-					mapView.getController().setZoom(21);
+					mapView.getController().setZoom(20);
 					mapView.invalidate();
 				}
 
