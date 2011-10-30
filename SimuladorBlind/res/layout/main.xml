@@ -1,11 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
 	android:orientation="vertical" android:layout_width="fill_parent"
 	android:layout_height="fill_parent">
-		<TextView android:id="@+id/description" android:layout_width="fill_parent"
-		android:layout_height="wrap_content"/>
+	<TextView 
+	    android:id="@+id/description" 
+	    android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+	    android:layout_alignParentTop="true"/>
+
 	<com.google.android.maps.MapView
-		android:id="@+id/mapview" android:layout_width="fill_parent"
-		android:layout_height="fill_parent" android:clickable="true"
-		android:apiKey="0KnGWJ_L8QcG7RAXpz3xRUozRRyPj2MiB6CK12w" />
-</LinearLayout>
+	    android:id="@+id/mapview"
+	    android:layout_width="fill_parent"
+	    android:layout_height="fill_parent"
+	    android:apiKey="0KnGWJ_L8QcFa4-l5-lZsOL4RE3v6sRPBP1xoHg"
+	    android:clickable="true" 
+	    android:layout_below="@id/description"/>
+
+</RelativeLayout>
