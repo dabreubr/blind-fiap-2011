@@ -1,0 +1,70 @@
+﻿/************************************************************
+********** - Modal - **********
+************************************************************/
+.modalBackground
+{
+	background-color: #F0F8FF;
+	filter: alpha(opacity=80);
+	opacity: 0.8;
+}
+/************************************************************
+********** - Body - **********
+************************************************************/
+body
+{
+	margin-top: 0px;
+	margin-left: 0px;
+	padding-top: 0px;
+	padding-left: 0px;
+	font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-size: 12px;
+}
+
+/*****************************************************/
+/* Menu */
+/*****************************************************/
+.applemenu
+{
+	margin: 5px 0;
+	padding: 0;
+	width: 170px;
+	border: 1px solid #9A9A9A;
+}
+
+.applemenu div.silverheader a
+{
+	background: black url(../../../Image/imgMenuFundo.gif) repeat-x left;
+	font-size: 12px;
+	color: White;
+	display: block;
+	position: relative;
+	width: auto;
+	padding: 5px 0;
+	padding-left: 8px;
+	text-decoration: none;
+}
+
+
+.applemenu div.silverheader a:visited, .applemenu div.silverheader a:active
+{
+	color: White;
+}
+
+
+.applemenu div.selected a, .applemenu div.silverheader a:hover
+{
+	background-image: url(../../../Image/imgMenuMouseHover.gif);
+	color: White;
+}
+
+.applemenu div.submenu
+{
+	background: White;
+	padding: 5px;
+	height: 180px;
+}
+
+.ItemMenu
+{
+		font-size: 11px;
+}

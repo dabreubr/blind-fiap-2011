@@ -1,0 +1,190 @@
+﻿/*****************************************************/
+/* Chk */
+/*****************************************************/
+.Chk
+{
+    font-family: Arial, Verdana, Helvetica, sans-serif;
+    font-size: 12px;
+    color: #1843a4;
+    font-weight: bold;
+}
+/*****************************************************/
+/* Table - REPEATER */
+/*****************************************************/
+.TbContornoRepeater
+{
+    border-bottom: solid 1px #696969;
+    border-right: solid 1px #696969;
+    border-left: solid 1px #B5B5B5;
+    border-collapse: collapse;
+    width:585px;
+}
+.TrCabecalho
+{
+    line-height: 20px;
+    text-align: center;
+    color: black;
+    font-weight: bold;
+    background-color: #3b70ae;
+    color: White;
+}
+.TrConteudoSubTitulo
+{
+    text-align: left;
+    color: White;
+    line-height: 18px;
+    background-color: #548dc2;
+}
+.TrConteudo
+{
+    text-align: left;
+    color: black;
+    line-height: 12px;
+}
+
+.TrConteudoDetalhe
+{
+    text-align: left;
+    font-family: Arial, Helvetica, sans-serif;
+    color: Black;
+    font-size: 12px;
+    line-height: 16px;
+    background-color: #cee3f6;
+}
+/*****************************************************/
+/* Label */
+/*****************************************************/
+.Label
+{
+    color: #1843a4;
+    font-weight: bold;
+    width: 124px;
+}
+.labelMedio
+{
+	font-size: 8.5pt;
+	width: 150px;
+}
+
+.labelGrande
+{
+	font-size: 8.5pt;
+	width: 250px;
+}
+
+/*****************************************************/
+/* TextBox */
+/*****************************************************/
+.TxtPequeno
+{
+    width: 80px;
+}
+.TxtMedio
+{
+	font-size: 8.5pt;
+	width: 150px;
+}
+
+.TxtGrande
+{
+	font-size: 8.5pt;
+	width: 450px;
+}
+
+/*****************************************************/
+/* Grid */
+/*****************************************************/
+.grid
+{
+    width: 100%;
+}
+.cabecalhoGrdVw_Linha
+{
+    background-color: #3b70ae;
+    color: White;
+    font-weight: bold;
+    line-height: 20px;
+    text-align:center;
+}
+
+.cabecalhoGrdVw_LinhaAlternada
+{
+    background-color: #cee3f6;
+    text-align:center;
+}
+
+.rowStyleSelected
+{
+	background-color:Gray;
+    color: White;
+    font-weight: normal;
+    margin-left: 5px;
+    text-align: left;
+    line-height: 16px;
+    width: 590px;
+    text-align:center;
+}
+
+.rowStyle
+{
+    color: Black;
+    font-weight: normal;
+    margin-left: 5px;
+    text-align: left;
+    line-height: 16px;
+    width: 590px;
+    text-align:center;
+}
+/*****************************************************/
+/* DropDown */
+/*****************************************************/
+.DropDownGrande
+{
+    width: 470px;
+    color: black;
+}
+.DropDownMedio
+{
+    width: 155px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+}
+
+/************************************************************
+********** - Span - **********
+************************************************************/
+span
+{
+	font-family: Arial, Helvetica, sans-serif;
+    color: #1843a4;
+}
+.spanTitulo
+{
+	font-family: Arial, Helvetica, sans-serif;
+    color: #1843a4;
+    font-size: 18pt;
+}
+.spanSubTitulo
+{
+	font-family: Arial, Helvetica, sans-serif;
+    color: #1843a4;
+    font-size: 12pt;
+}
+.spanValor
+{
+	background-color: #FAF0E6;
+	color: #000000;
+	font-size: 9pt;
+	font-weight: bold;
+	width: 200px;
+	text-align: right;
+}
+/*****************************************************/
+/* SiteMap */
+/*****************************************************/
+.SiteMap
+{
+    text-align:right;
+    width: 100%;
+}
+
