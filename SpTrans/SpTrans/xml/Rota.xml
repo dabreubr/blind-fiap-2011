@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<rota>
+	<quantidadeConducao>2</quantidadeConducao>
+	<tempoViagem>01:58</tempoViagem>
+	<valorTotalTarifa>R$ 3,00</valorTotalTarifa>
+	
+	<enderecoEmbarque1>R. NAZIR MIGUEL, 559.</enderecoEmbarque1>
+	<linha1>7545-10 PCA RAMOS DE AZEVEDO.</linha1>
+	<enderecoDesembarque1>R. DA CONSOLACAO, 66 REF.: AV SAO LUIS/ R DOUTOR BRAULIO GOMES.</enderecoDesembarque1>
+
+	<enderecoEmbarque2>AV. S. LUIS, 178 REF.: PC DOM JOSE GASPAR/ R CORONEL XAVIER DE TOLEDO.</enderecoEmbarque2>
+	<linha2>4113-10 PCA. DA REPÚBLICA-GENTIL DE MOURA.</linha2>
+	<enderecoDesembarque2>AV. LACERDA FRANCO, 1112 REF.: R ROBERTSON/ R ANTONIO TAVARES.</enderecoDesembarque2>
+
+	<enderecoFinal>AV. LINS DE VASCONCELOS, 1222 CAMBUCI</enderecoFinal>
+</rota>
+
+
+
