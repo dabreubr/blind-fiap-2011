@@ -1,0 +1,167 @@
+﻿/************************************************************
+********** - divLeft - **********
+************************************************************/
+.divLeft
+{
+	float: left;
+}
+
+/************************************************************
+********** - subTitulo - **********
+************************************************************/
+.subTitulo
+{
+    background: #ff6224;
+    min-width: 600px;
+    height: 5px;
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+.tituloCluster
+{
+    color: #ffffff;
+}
+
+.textoInstanciaA
+{
+    color: #000000;
+}
+.textoInstanciaB
+{
+    color: #1e90ff;
+}
+.textoInstanciaC
+{
+    color: #006400;
+}
+.textoInstanciaD
+{
+    color: #8b0000;
+}
+
+/************************************************************
+********** - table - ********** ffd800
+************************************************************/
+.tablePrincipal
+{
+    width: 100%;
+    text-align:center;
+}
+
+.tdConteudo
+{
+    vertical-align: top;
+    width: 740px;
+}
+
+.TdConteudo1
+{
+    text-align:left;
+    vertical-align:top;
+    width: 124px;
+}
+
+.TdConteudo2
+{
+    text-align:left;
+    vertical-align:middle;
+    width: 470px;
+}
+
+.TdConteudo3
+{
+	vertical-align: top;
+    text-align:center;
+}
+
+.tableServer
+{
+	width:250px;
+	height:180px;
+	border-color:Black;
+	border-width:thin;
+	border-bottom:solid 1px #000000;
+	border-top:solid 1px #000000;
+	border-left:solid 1px #000000;
+	border-right:solid 1px #000000;
+}
+
+.tableServerTitulo
+{
+	width:250px;
+	border-color:Black;
+	border-width:thin;
+	border-bottom:solid 1px #000000;
+	text-align:center;
+}
+
+
+
+
+/************************************************************
+********** - Clusters - **********
+************************************************************/
+.tableServerCluster
+{
+	width:200px;
+	height:750px;
+	border-color:Black;
+	border-width:thin;
+	border-bottom:solid 1px #3c72b0;
+	border-top:solid 1px #3c72b0;
+	border-left:solid 1px #3c72b0;
+	border-right:solid 1px #3c72b0;
+}
+
+.tableServerSubCluster
+{
+	width:190px;
+	border-color:Black;
+	border-width:thin;
+	border-bottom:solid 1px #3c72b0;
+	border-top:solid 1px #3c72b0;
+	border-left:solid 1px #3c72b0;
+	border-right:solid 1px #3c72b0;
+}
+
+.tableServerTituloCluster
+{
+	width:180px;
+	height: 20px;
+	text-align:center;
+	color:#ffffff;
+}
+.tableServerSubTituloCluster
+{
+	width:170px;
+	height: 20px;
+	text-align:center;
+	color:#ffffff;
+}
+.tableServerSubTituloClusterA
+{
+	background-color: #ffffff;
+	height:25px;
+	color:White;
+}
+.tableServerSubTituloClusterB
+{
+	background-color: #ffffff;
+	height:25px;
+}
+.tableServerSubTituloClusterC
+{
+	background-color: #ffffff;
+	height:25px;
+}
+.tableServerSubTituloClusterD
+{
+	background-color: #ffffff;
+	height:25px;
+}
+
+.tableServerImgServer
+{
+	width: 70px;
+}

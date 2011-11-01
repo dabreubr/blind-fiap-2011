@@ -1,0 +1,135 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Principal.master.cs" Inherits="AdmiSee.Web.MasterPage.Principal" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>Administrador iSee</title>
+</head>
+<script type="text/javascript" src="../JS/jquery-1.4.2.min.js"></script>
+<script type="text/javascript" src="../JS/ddaccordion.js"></script>
+<script type="text/javascript">
+ddaccordion.init({
+        headerclass: "silverheader",
+        contentclass: "submenu",
+        revealtype: "mouseover",
+        mouseoverdelay: 200,
+        collapseprev: true,
+        defaultexpanded: [0],
+        onemustopen: true,
+        animatedefault: false,
+        persiststate: true,
+        toggleclass: ["", "selected"],
+        togglehtml: ["", "", ""],
+        animatespeed: "fast",
+        oninit: function(headers, expandedindices) { },
+        onopenclose: function(header, index, state, isuseractivated) { }
+    })
+</script>
+<body>
+    <form id="form1" runat="server">
+		<asp:ScriptManager ID="ScriptManager1" runat="server" EnablePartialRendering="true">
+			<Scripts>
+				<asp:ScriptReference Path="~/JS/jquery.mask.js" />
+			</Scripts>
+		</asp:ScriptManager>
+		<script language="javascript" type="text/javascript">
+			(function ($) {
+				$(
+							function () {
+								$('input:text').setMask();
+							}
+						);
+			})(jQuery);
+		</script>
+		<script id="Pop" language="javascript" type="text/javascript">
+			Sys.WebForms.PageRequestManager.getInstance().add_beginRequest(BeginRequestHandler);
+			Sys.WebForms.PageRequestManager.getInstance().add_endRequest(EndRequestHandler)
+
+			function BeginRequestHandler(sender, args) {
+				$find("popAguarde").show();
+			}
+
+			function EndRequestHandler(sender, args) {
+				$find("popAguarde").hide();
+			}
+		</script>
+    <table cellpadding="0" cellspacing="0" border="0" style="width: 1258px; height:600px" align="center">
+        <tr>
+            <td colspan="2" valign="top">
+                <asp:Image ID="imgCabecalho" runat="server" ImageUrl="~/Image/Cabecalho.jpg" />
+            </td>
+        </tr>
+        <tr>
+            <td colspan="2">
+                <table class="SiteMap">
+                    <tr>
+                        <td>
+                            <asp:SiteMapPath ID="smpMenu" runat="server">
+                            </asp:SiteMapPath>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+		<tr>
+			<td colspan="2" align="right">
+				<asp:ImageButton ID="btnSair" runat="server" ImageUrl="~/Image/btnSair.gif" OnClick="btnSair_Click" />
+			</td>
+		</tr>
+		<tr>
+			<td style="width: 258px" valign="top">
+				<table border="0">
+					<colgroup>
+						<col />
+						<col />
+					</colgroup>
+					<tbody>
+						<tr>
+							<td class="TdConteudo3">
+								<div class="applemenu">
+									<div class="silverheader">
+										<asp:HyperLink ID="hlConfiguracoes" runat="server" style="cursor:pointer;">Cadastrar</asp:HyperLink>
+									</div>
+									<div class="submenu">
+										<asp:HyperLink ID="hlLimites" runat="server" NavigateUrl="~/CadastrarRotas.aspx">Rotas</asp:HyperLink><br />
+									</div>
+									<div class="silverheader">
+										<asp:HyperLink ID="hlMonitoramento" runat="server" style="cursor:pointer;">Consultar</asp:HyperLink>
+									</div>
+									<div class="submenu">
+										<asp:HyperLink ID="hlDesenvolvimento" runat="server" NavigateUrl="~/ConsultarRotas.aspx">Rotas</asp:HyperLink><br />
+									</div>
+								</div>
+							</td>
+						</tr>
+					</tbody>
+				</table>
+			</td>
+			<td style="width: 1000px" valign="top">
+				<asp:ContentPlaceHolder ID="ContentPlaceHolder1" runat="server">
+				</asp:ContentPlaceHolder>
+			</td>
+		</tr>
+        <tr>
+            <td colspan="2">
+                <asp:Image ID="imgRodape" runat="server" ImageUrl="~/Image/Rodape.jpg" />
+            </td>
+        </tr>
+    </table>
+		<center>
+			<asp:UpdateProgress ID="uprMaster" DisplayAfter="100" DynamicLayout="True" runat="server">
+				<ProgressTemplate>
+					&nbsp;</ProgressTemplate>
+			</asp:UpdateProgress>
+			<ajax:ModalPopupExtender ID="popAguarde" runat="server" TargetControlID="uprMaster" PopupControlID="pnAguarde" BackgroundCssClass="modalBackground" BehaviorID="popAguarde" />
+			<asp:Panel ID="pnAguarde" runat="server">
+				<center>
+					<asp:Image ImageUrl="~/Image/loading.gif" ID="imgLoad" runat="server" AlternateText="Aguarde..." />
+					<br />
+					<span class="texto_azul_claro_16">Aguarde...</span>
+				</center>
+			</asp:Panel>
+		</center>
+    </form>
+</body>
+</html>
