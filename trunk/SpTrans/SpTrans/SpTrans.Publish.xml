@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<publishData>
+  <publishProfile publishUrl="ftp://ftp.goomedia.com.br/Web/TesteSpTrans" deleteExistingFiles="False" ftpAnonymousLogin="False" ftpPassiveMode="True" msdeploySite="SpTrans" msdeploySiteID="" msdeployRemoteSitePhysicalPath="" msdeployAllowUntrustedCertificate="False" msdeploySkipExtraFilesOnServer="True" msdeployMarkAsApp="False" profileName="WebService" publishMethod="FTP" replaceMatchingFiles="True" userName="homeaccess" savePWD="False" userPWD="" SelectedForPublish="True">
+    <file relUrl="ServicoRotas.asmx" publishTime="07/13/2011 17:23:28" />
+    <file relUrl="bin/SpTrans.pdb" publishTime="08/30/2011 23:51:19" />
+    <file relUrl="Web.config" publishTime="08/27/2011 14:29:51" />
+    <file relUrl="bin/SpTrans.dll" publishTime="08/30/2011 23:51:19" />
+    <file relUrl="xml/Rota.xml" publishTime="08/27/2011 11:48:40" />
+    <file relUrl="xml/PosicaoOnibus.xml" publishTime="08/31/2011 09:45:58" />
+  </publishProfile>
+</publishData>
