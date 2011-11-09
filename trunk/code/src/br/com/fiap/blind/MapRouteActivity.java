@@ -24,7 +24,6 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -59,7 +58,6 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 	private TextToSpeech mTts;
 	private ReentrantLock waitForInitLock = new ReentrantLock();
 	private boolean ttsInitialized = false;
-	private Geocoder geocoder;
 	private List<Address> listAddressDesembarque = null;
 	private String metodoTracarRota="TracarRota";
 	private String metodoRetornaPosicaoOnibusNovo="RetornaPosicaoOnibusNovo";
@@ -91,7 +89,6 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
             txtDescription = (TextView) findViewById(R.id.description);
             mapView = (MapView) findViewById(R.id.mapview);
             mapView.setBuiltInZoomControls(true);
-			geocoder = new Geocoder(this);
 			trocouOnibus = true;
 			aguardarOnibus = false;
 			obteveRotaOnibus = false;
@@ -104,8 +101,8 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
     }
     
     private void iniciarLocationListener() {
-    	getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 10000, 0, this);
-    	getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 10000, 0, this);
+    	getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 3000, 0, this);
+    	getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 3000, 0, this);
     	Location loc = getLocationManager().getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
     	if (loc != null) {
     		setNewLocation(loc);
@@ -277,6 +274,7 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 						if (distanciaAnterior != null) {
 							if (distancia > distanciaAnterior) { // se aumentou a distancia recalcula a rota
 								// sempre altera essas variaveis para poder recalcular rota
+								falar("Recalculando rota...");
 								trocouOnibus = true;
 								mRota = null;
 							}
@@ -290,9 +288,9 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 					List<Address> listAddress = null;
 					if (transportes.size() > indiceOnibus) {
 						transporte = transportes.get(indiceOnibus);
-						listAddress = geocoder.getFromLocationName(transporte.getEmbarque(), 1);
+						listAddress = ReverseGeocode.getFromLocationName(transporte.getEmbarque() + " - Sao Paulo", 1);
 					} else {
-						listAddress = geocoder.getFromLocationName(enderecoFinal, 1);
+						listAddress = ReverseGeocode.getFromLocationName(enderecoFinal + " - Sao Paulo", 1);
 					}
 					double toLat = listAddress.get(0).getLatitude();
 					double toLon = listAddress.get(0).getLongitude();
@@ -305,7 +303,7 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 					mapView.getOverlays().add(new RouteOverlay(mRota, mapView));
 					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
 					mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
-					mapView.getController().setZoom(21);
+					mapView.getController().setZoom(20);
 					mapView.invalidate();
 					for (int i=0; i<mRota.mPoints.length; i++) {
 						if (((int) (mRota.mPoints[i].getmLatitude()*1E4) == latitudeAprox) &&
@@ -340,7 +338,7 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 					mapView.getOverlays().clear();
 					mapView.getOverlays().add(new PositionOverlay(latitudeInt, longitudeInt));
 					mapView.getController().setCenter(new GeoPoint(latitudeInt, longitudeInt));
-					mapView.getController().setZoom(21);
+					mapView.getController().setZoom(20);
 					mapView.invalidate();
 				}
 
@@ -371,7 +369,7 @@ public class MapRouteActivity extends MapActivity implements Runnable, LocationL
 
 				if (noOnibus) {
 					if (listAddressDesembarque == null)
-						listAddressDesembarque = geocoder.getFromLocationName(transporte.getDesembarque(), 1);
+						listAddressDesembarque = ReverseGeocode.getFromLocationName(transporte.getDesembarque() + " - Sao Paulo", 1);
 					else {
 						double toLat = listAddressDesembarque.get(0).getLatitude();
 						double toLon = listAddressDesembarque.get(0).getLongitude();
