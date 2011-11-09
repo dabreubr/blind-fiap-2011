@@ -25,7 +25,6 @@ import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.RectF;
 import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -62,7 +61,8 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 			{-46.794310,-23.603750},
 			{-46.794350,-23.603650},
 			{-46.794430,-23.603540}, // voz
-			// {-46.795000,-23.604910} // Testes para recalcular rota
+			// {-46.795000,-23.604910}, // Testes para recalcular rota
+			// {-46.794430,-23.603540}, // Testes para recalcular rota
 			{-46.794370,-23.603480},
 			{-46.794270,-23.603380},
 			{-46.794270,-23.603280},
@@ -85,7 +85,6 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 	private TextToSpeech mTts;
 	private ReentrantLock waitForInitLock = new ReentrantLock();
 	private boolean ttsInitialized = false;
-	private Geocoder geocoder;
 	private List<Address> listAddressDesembarque = null;
 	private String metodoTracarRota="TracarRota";
 	private String metodoRetornaPosicaoOnibusNovo="RetornaPosicaoOnibusNovo";
@@ -112,7 +111,6 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 
 	public void iniciar() {
 		if (ttsInitialized) {
-			geocoder = new Geocoder(this);
 			trocouOnibus = true;
 			aguardarOnibus = false;
 			obteveRotaOnibus = false;
@@ -214,9 +212,9 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 					List<Address> listAddress = null;
 					if (transportes.size() > indiceOnibus) {
 						transporte = transportes.get(indiceOnibus);
-						listAddress = geocoder.getFromLocationName(transporte.getEmbarque(), 1);
+						listAddress = ReverseGeocode.getFromLocationName(transporte.getEmbarque() + " - Sao Paulo", 1);
 					} else {
-						listAddress = geocoder.getFromLocationName(enderecoFinal, 1);
+						listAddress = ReverseGeocode.getFromLocationName(enderecoFinal + " - Sao Paulo", 1);
 					}
 					double toLat = listAddress.get(0).getLatitude();
 					double toLon = listAddress.get(0).getLongitude();
@@ -296,7 +294,7 @@ public class MapRouteActivity extends MapActivity implements LocationListener, R
 
 				if (noOnibus) {
 					if (listAddressDesembarque == null)
-						listAddressDesembarque = geocoder.getFromLocationName(transporte.getDesembarque(), 1);
+						listAddressDesembarque = ReverseGeocode.getFromLocationName(transporte.getDesembarque() + " - Sao Paulo", 1);
 					else {
 						double toLat = listAddressDesembarque.get(0).getLatitude();
 						double toLon = listAddressDesembarque.get(0).getLongitude();
