@@ -1,13 +1,11 @@
 package br.com.fiap.blind;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Address;
-import android.location.Geocoder;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -31,23 +29,20 @@ public class Endereco extends Activity {
         	}
         }
         
-        Geocoder geocoder = new Geocoder(this);
         try {
-        	addressOrigem = geocoder.getFromLocation(Gps.getLatitude(), Gps.getLongitude(), 1);
+        	addressOrigem = ReverseGeocode.getFromLocation(Gps.getLatitude(), Gps.getLongitude(), 1);
     		Gps.setEnderecoOrigem(addressOrigem.get(0));
     		
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			Log.e("GeocoderLog", "Deu erro o geo coder origem - " + e1.getMessage());
 		}
 		
         try {
-        	address = geocoder.getFromLocationName(paramEndereco + " - SP", 3);
+        	address = ReverseGeocode.getFromLocationName(paramEndereco  + " - Sao Paulo", 3);
         	for (int i=0; i < address.size(); i++) {
-        		if (address.get(i).getThoroughfare() != null) {
-        			String rua = tratarTexto(address.get(i).getThoroughfare());
-        			String bairro = address.get(i).getLocality();
-        			String uf = address.get(i).getAdminArea();
-        			enderecos.add(rua + " - " + bairro + " - " + uf);
+        		if (address.get(i).getAddressLine(0) != null) {
+        			String rua = tratarTexto(address.get(i).getAddressLine(0));
+        			enderecos.add(rua);
         		}
         	}
    	
@@ -55,7 +50,7 @@ public class Endereco extends Activity {
             itDesambiguaVoz.putExtra("lista", enderecos);
             startActivityForResult(itDesambiguaVoz, DESAMBIGUA_VOZ);
             
-		} catch (IOException e) {
+		} catch (Exception e) {
 			Log.e("GeocoderLog", "Deu erro o geo coder - " + e.getMessage());
 		}
 	}
