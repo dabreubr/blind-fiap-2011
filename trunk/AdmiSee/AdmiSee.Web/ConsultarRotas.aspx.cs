@@ -74,8 +74,8 @@ namespace AdmiSee.Web
 				LimparGridRotaConducao();
 
 				DAO dao = new DAO();
-				gvRota.DataSource = dao.RetornaRota(txtEnderecoOrigem.Text.Trim(), txtEnderecoDestino.Text.Trim());
-				gvRota.DataBind();
+				gvRotas.DataSource = dao.RetornaRota(txtEnderecoOrigem.Text.Trim(), txtEnderecoDestino.Text.Trim());
+				gvRotas.DataBind();
 			}
 			catch (Exception ex)
 			{
@@ -94,7 +94,7 @@ namespace AdmiSee.Web
 			try
 			{
 				DAO dao = new DAO();
-				int idRota = int.Parse(gvRota.DataKeys[gvRota.SelectedIndex].Value.ToString());
+				int idRota = int.Parse(gvRotas.DataKeys[gvRotas.SelectedIndex].Value.ToString());
 				gvRotaConducao.DataSource = dao.RetornaRotaConducao(idRota);
 				gvRotaConducao.DataBind();
 			}
@@ -138,9 +138,9 @@ namespace AdmiSee.Web
 		/// </summary>
 		private void LimparGridRota()
 		{
-			gvRota.SelectedIndex = -1;
-			gvRota.DataSource = null;
-			gvRota.DataBind();
+			gvRotas.SelectedIndex = -1;
+			gvRotas.DataSource = null;
+			gvRotas.DataBind();
 		}
 		#endregion
 
