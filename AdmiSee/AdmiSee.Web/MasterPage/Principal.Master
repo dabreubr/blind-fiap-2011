@@ -4,6 +4,10 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head id="Head1" runat="server">
     <title>Administrador iSee</title>
+	<link href="../Style/CommonPage.css" rel="stylesheet" type="text/css" />
+	<link href="../Style/Controles.css" rel="stylesheet" type="text/css" />
+	<link href="../Style/Master.css" rel="stylesheet" type="text/css" />
+	<link href="../Style/Page.css" rel="stylesheet" type="text/css" />
 </head>
 <script type="text/javascript" src="../JS/jquery-1.4.2.min.js"></script>
 <script type="text/javascript" src="../JS/ddaccordion.js"></script>
@@ -64,8 +68,12 @@ ddaccordion.init({
                 <table class="SiteMap">
                     <tr>
                         <td>
-                            <asp:SiteMapPath ID="smpMenu" runat="server">
-                            </asp:SiteMapPath>
+							<asp:SiteMapPath ID="smpMenu" runat="server" Font-Names="Arial" Font-Size="8pt" PathSeparator=" : ">
+								<PathSeparatorStyle Font-Bold="True" ForeColor="#507CD1" />
+								<CurrentNodeStyle ForeColor="#333333" />
+								<NodeStyle Font-Bold="True" ForeColor="#284E98" />
+								<RootNodeStyle Font-Bold="True" ForeColor="#507CD1" />
+							</asp:SiteMapPath>
                         </td>
                     </tr>
                 </table>
@@ -116,20 +124,6 @@ ddaccordion.init({
             </td>
         </tr>
     </table>
-		<center>
-			<asp:UpdateProgress ID="uprMaster" DisplayAfter="100" DynamicLayout="True" runat="server">
-				<ProgressTemplate>
-					&nbsp;</ProgressTemplate>
-			</asp:UpdateProgress>
-			<ajax:ModalPopupExtender ID="popAguarde" runat="server" TargetControlID="uprMaster" PopupControlID="pnAguarde" BackgroundCssClass="modalBackground" BehaviorID="popAguarde" />
-			<asp:Panel ID="pnAguarde" runat="server">
-				<center>
-					<asp:Image ImageUrl="~/Image/loading.gif" ID="imgLoad" runat="server" AlternateText="Aguarde..." />
-					<br />
-					<span class="texto_azul_claro_16">Aguarde...</span>
-				</center>
-			</asp:Panel>
-		</center>
     </form>
 </body>
 </html>

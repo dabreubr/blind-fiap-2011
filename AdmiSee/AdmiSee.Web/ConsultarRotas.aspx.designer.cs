@@ -13,15 +13,6 @@ namespace AdmiSee.Web {
     public partial class ConsultarRotas {
         
         /// <summary>
-        /// uppMaster control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.UpdatePanel uppMaster;
-        
-        /// <summary>
         /// Image2 control.
         /// </summary>
         /// <remarks>
@@ -85,13 +76,13 @@ namespace AdmiSee.Web {
         protected global::System.Web.UI.WebControls.Image Image3;
         
         /// <summary>
-        /// gvRota control.
+        /// gvRotas control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.WebControls.GridView gvRota;
+        protected global::System.Web.UI.WebControls.GridView gvRotas;
         
         /// <summary>
         /// gvRotaConducao control.
